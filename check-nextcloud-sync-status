@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -u
+: "${BREVO_API_KEY}"
+: "${MAIL_FROM}"
+: "${MAIL_TO}"
+
+out=$(~/.local/bin/nextcloud-status.py 2>&1 | paste -sd ' ')
+subject="Nextcloud $(uname -n) sync status"
+
+curl -fsS -X POST https://api.brevo.com/v3/smtp/email \
+  -H "api-key: $BREVO_API_KEY" -H "content-type: application/json" \
+  -d "{\"sender\":{\"email\":\"$MAIL_FROM\"},\"to\":[{\"email\":\"$MAIL_TO\"}],\"subject\":\"$subject\",\"textContent\":\"$out\"}"
